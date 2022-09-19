@@ -150,7 +150,11 @@ class EV():
 			# Reduce SOC upon arrival
 			# EV arriving but not connected
 			if i == arrival_interval:
+
+				print("soc: "+str(soc))
+				print("minsoc: "+str(minsoc))
 				soc -= self.evenergy * 1000 * (3600 / cfg_sim['timebase'])
+
 				assert(soc >= 0)
 			# EV present
 			if i >= arrival_interval and i < departure_interval:
@@ -160,8 +164,8 @@ class EV():
 
 			# EV not present
 			else:
-				# assert(value == 0)
-				pass
+				assert(value == 0)
+
 
 			soc += value
 			assert (soc >= 0)

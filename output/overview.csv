@@ -1,3 +1,4 @@
 ,, cost, co2 emissions, 1-norm, 2-norm, inf-norm, demand, selfconsumption, net metering, SUI, LCF, SCF
 ,, EUR, grammes of CO2, Watt, Watt, Watt, kWh, kWh, kWh, ratio, ratio, ratio
 ,, energy price without taxes, total emissions, self consumption metric, flatness, biggest peak, total consumed energy, genertion directly consumed, net metered energy, sustainability index factor, load coverage factor (how much demand was overall matched by local generation), storage coverage factor (how much of demand was supplied by storage)
+optimize_greedy,House-0, 2.62, 13779, 9.23E+03, 2.71E+02, 2.56E+03, 48, 11, 12, 0.23, 0.25, 0.00

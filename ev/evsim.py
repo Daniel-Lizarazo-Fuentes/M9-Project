@@ -5,21 +5,33 @@ import math
 
 # This function simulates the behaviour of the device
 def evsim(ev, planning, lossfree=True):
-
-
-
 	# result parameter:
 	profile = []
+	#TODO evsoc/evminsoc don't change her :)
 	for slot in planning:
+		# Figure out if the charge/discharge needed is larger than what is allowed, if so set to max
 		change  = 0
-		if(slot<=ev.evpmax):
+		if(slot <= ev.evpmax):
 			change = slot
 		else:
 			change = ev.evpmax
-		if((ev.evsoc+change) < ev.evpmax):
-			profile.append(change)
-		else:
-			profile.append(ev.evpmax-ev.evsoc)
+
+		# Check if battery after charge is not over capacity or empty
+
+		if((ev.evsoc+change) > ev.evcapacity or (ev.evsoc+change) < ev.evminsoc):
+
+			print("ev.evsoc: " + str(ev.evsoc))
+			print("ev.evminsco: " + str(ev.evminsoc))
+			# check if batery is going over capicity, then change to max
+			if ((ev.evsoc + change) > ev.evcapacity):
+				change = ev.evcapacity - ev.evsoc
+			# if battery goes into negative territory set drain to reach minsoc
+			else:
+
+				change = ev.evminsoc - ev.soc
+
+
+		profile.append(change)
 
 	# ev parameters can be obtained as follows
 	# ev.evsoc              # State of Charge of the EV in kWh
