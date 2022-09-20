@@ -22,7 +22,8 @@ def batterysim(battery, planning, lossfree=True):
 
 	# Lossfree simulation:
 	if lossfree:
-		pass #TODO To be removed!
+			pass
+		#TODO To be removed!
 		# Here you will need to implement yoor simulation code
 		# Create the resulting by filling the profile list
 		# This can be done by e.g. profile.append(value)
