@@ -3,85 +3,76 @@ from settings.variables import *
 
 import math
 
+
 # This function simulates the behaviour of the device
 def evsim(ev, planning, lossfree=True):
-	# result parameter:
-	profile = []
-	#TODO evsoc/evminsoc don't change her :)
-	for slot in planning:
-		# Figure out if the charge/discharge needed is larger than what is allowed, if so set to max
-		change  = 0
-		if(slot <= ev.evpmax):
-			change = slot
-		else:
-			change = ev.evpmax
+    # result parameter:
+    profile = []
+    for slot in planning:
+        profile.append(0)
 
-		# Check if battery after charge is not over capacity or empty
+    # ev parameters can be obtained as follows
+    # ev.evsoc              # State of Charge of the EV in kWh
+    # ev.evminsoc           # Minumum State of Charge of the EV in kWh
+    # ev.evcapacity         # Capacity of the EV in kWh
+    # ev.evpmin             # Minimum power of the EV in W
+    # ev.evpmax             # Maximum power of the EV in W
 
-		if((ev.evsoc+change) > ev.evcapacity or (ev.evsoc+change) < ev.evminsoc):
+    # Timing variables:
+    # ev.evenergy 	        # Energy demand in kWh per driving session
+    # ev.evminsoc  	        # Minimum SoC to reach after each session (because of driving)
+    # ev.evconnectiontime   # Hours the EV is connected
+    # ev.evarrivalhour 	    # Hour of arrival of the EV each day
 
-			print("ev.evsoc: " + str(ev.evsoc))
-			print("ev.evminsco: " + str(ev.evminsoc))
-			# check if batery is going over capicity, then change to max
-			if ((ev.evsoc + change) > ev.evcapacity):
-				change = ev.evcapacity - ev.evsoc
-			# if battery goes into negative territory set drain to reach minsoc
-			else:
+    # Other input
+    # planning, which is the planning created for the device with desired control (power) actions
 
-				change = ev.evminsoc - ev.soc
+    # Running the simulation of the device
 
+    # What is already given is to determine if the EV is connected to the charging station (at home) or not (driving)
+    intervals_per_day = (3600 / cfg_sim['timebase']) * 24
+    intervals_per_hour = (3600 / cfg_sim['timebase'])
+    j = 0
+    for i in range(0, len(planning)):
+        # Helpers to calculate availability
+        arrival_day = math.floor(i / intervals_per_day)
+        arrival_interval = arrival_day * intervals_per_day + ev.evarrivalhour * intervals_per_hour
+        departure_interval = arrival_interval + ev.evconnectiontime * intervals_per_hour
 
-		profile.append(change)
-
-	# ev parameters can be obtained as follows
-	# ev.evsoc              # State of Charge of the EV in kWh
-	# ev.evminsoc           # Minumum State of Charge of the EV in kWh
-	# ev.evcapacity         # Capacity of the EV in kWh
-	# ev.evpmin             # Minimum powyr of the EV in W
-	# ev.evpmax             # Maximum power of the EV in W
-
-	# Timing variables:
-	# ev.evenergy 	        # Energy demand in kWh per driving session
-	# ev.evminsoc  	        # Minimum SoC to reach after each session (because of driving)
-	# ev.evconnectiontime   # Hours the EV is connected
-	# ev.evarrivalhour 	    # Hour of arrival of the EV each day
-
-	# Other input
-	# planning, which is the planning created for the device with desired control (power) actions
-
-	# Running the simulation of the device
+        # Moment at which the EV arrives
+        if i == arrival_interval:
+            ev.evsoc -=  (ev.evenergy * (departure_interval-arrival_interval))
 
 
-	# What is already given is to determine if the EV is connected to the charging station (at home) or not (driving)
-	intervals_per_day = (3600 / cfg_sim['timebase']) * 24
-	intervals_per_hour = (3600 / cfg_sim['timebase'])
+        # Interval that the EV is connected (available)
+        if i >= arrival_interval and i < departure_interval:
+            #print("before charging"+str(ev.evsoc))
+            change = 0
 
-	for i in range(0, len(planning)):
-		# Helpers to calculate availability
-		arrival_day = math.floor(i/intervals_per_day)
-		arrival_interval = arrival_day*intervals_per_day + ev.evarrivalhour * intervals_per_hour
-		departure_interval = arrival_interval + ev.evconnectiontime * intervals_per_hour
+            # Check if ev is at full capacity
+            if (ev.evsoc < ev.evcapacity):
 
-		# FIXME Here you will need to implement the behaviour of the electric vehicle
-		# You do not necessarily need to use all if-constructs, but htey are defined for your confenience if you wish to make use of them
-		# Keep the "pass" if you do not want to use one of the if-constructs.
-		if i == arrival_interval:
-			#TODO Moment at which the EV arrives
-			pass
+                # Set change to difference in watt
+                change = (ev.evcapacity - ev.evsoc)*1000
 
-		if i >= arrival_interval and i < departure_interval:
-			#TODO Interval that the EV is connected (available)
-			pass
+                # Check if change is larger than allowed
+                if (change > ev.evpmax):
+                    change = ev.evpmax
 
-		else:
-			#TODO Interval that the EV is disconnected (unavailable)
-			pass
+                ev.evsoc+=change/1000
 
-		if i == departure_interval:
-			#TODO Moment at which the EV departs
-			pass
+                profile[i] = change
 
-	# Finally, the resulting power profile for the devicee must be returned
-	# This is also a list, with each value representing the power consumption (average) during an interval in Watts
-	# The length of this list must be equal to the input planning list
-	return profile
+
+        else:
+            # Interval that the EV is disconnected (unavailable)
+            pass
+
+        if i == departure_interval:
+            # Moment at which the EV departs
+            pass
+
+    # Finally, the resulting power profile for the devicee must be returned
+    # This is also a list, with each value representing the power consumption (average) during an interval in Watts
+    # The length of this list must be equal to the input planning list
+    return profile

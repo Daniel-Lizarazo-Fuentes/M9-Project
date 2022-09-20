@@ -74,7 +74,7 @@ cfg_houses = {
 
 		# Battery configuration
 		"batminsoc":	0,  # Minimum state of charge in kWh
-		"batcapacity":  4,  # Capacity in kWh
+		"batcapacity":  3,  # Capacity in kWh
 		"batsoc":       0,  # Initial State of Charge at start of simulation in kWh
 		"batpmin":      -3000,  # Minumum power (discharge is negative) in W
 		"batpmax":      3000,  # Maximum power in W

@@ -18,10 +18,10 @@ class EV():
 		self.type = "load"
 
 		# Placeholder, will be loaded upon initialize()
-		self.evsoc = 0
-		self.evcapacity = 40
-		self.evpmin = 0
-		self.evpmax = 11000
+		self.evsoc = 0 # w
+		self.evcapacity = 40 # kw
+		self.evpmin = 0  # w
+		self.evpmax = 11000 # w
 
 		# Static Charging session duration 
 		self.evenergy = 5 + (self.number % 5)  # Energy demand in kWh per driving session
@@ -152,8 +152,10 @@ class EV():
 			if i == arrival_interval:
 
 				print("soc: "+str(soc))
-				print("minsoc: "+str(minsoc))
+
 				soc -= self.evenergy * 1000 * (3600 / cfg_sim['timebase'])
+
+				print("socafter: " + str(soc))
 
 				assert(soc >= 0)
 			# EV present
