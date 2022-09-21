@@ -2,7 +2,7 @@ from settings.constants import *
 from settings.variables import *
 
 import math
-
+import copy
 
 # This function simulates the behaviour of the device
 def evsim(ev, planning, lossfree=True):
@@ -32,6 +32,9 @@ def evsim(ev, planning, lossfree=True):
     # What is already given is to determine if the EV is connected to the charging station (at home) or not (driving)
     intervals_per_day = (3600 / cfg_sim['timebase']) * 24
     intervals_per_hour = (3600 / cfg_sim['timebase'])
+
+    soc = copy.deepcopy(ev.evsoc)
+
     j = 0
     for i in range(0, len(planning)):
         # Helpers to calculate availability
@@ -42,7 +45,7 @@ def evsim(ev, planning, lossfree=True):
         # Moment at which the EV arrives
         if i == arrival_interval:
 
-            ev.evsoc -=  ev.evenergy
+            soc -=  ev.evenergy
 
 
         # Interval that the EV is connected (available)
@@ -51,11 +54,11 @@ def evsim(ev, planning, lossfree=True):
             change = 0
 
             # Check if ev is at full capacity
-            if (ev.evsoc < ev.evcapacity):
+            if (soc < ev.evcapacity):
 
                 # Set change to difference in watt
 
-                change = (ev.evcapacity - ev.evsoc)*1000
+                change = (ev.evcapacity - soc)*1000
 
                 # Check if change is larger than allowed
                 if (change > ev.evpmax):
@@ -64,7 +67,7 @@ def evsim(ev, planning, lossfree=True):
 
                 profile[i] = change
 
-            ev.evsoc += change / 1000
+            soc += change / 1000
         else:
             # Interval that the EV is disconnected (unavailable)
             pass

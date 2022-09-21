@@ -1,9 +1,10 @@
 from settings.constants import *
 from settings.variables import *
 
+import copy
+
 # This function simulates the behaviour of the device
 def batterysim(battery, planning, lossfree=True):
-
 	# result parameter to be filled:
 	profile = []
 	for slot in planning:
@@ -22,8 +23,24 @@ def batterysim(battery, planning, lossfree=True):
 
 	# Lossfree simulation:
 	if lossfree:
-			pass
-		#TODO To be removed!
+		soc = copy.deepcopy(battery.batsoc)
+		for i in range(0, len(planning)):
+			change = 0
+
+			# Check if battery is at full capacity
+			if (soc < battery.batcapacity):
+
+				# Set change to difference in watt
+				change = (battery.batcapacity - soc) * 1000
+
+				# Check if change is larger than allowed
+				if (change >  battery.batpmax):
+					change = battery.batpmax
+
+				profile[i] = change
+
+			soc += change / 1000
+
 		# Here you will need to implement yoor simulation code
 		# Create the resulting by filling the profile list
 		# This can be done by e.g. profile.append(value)
