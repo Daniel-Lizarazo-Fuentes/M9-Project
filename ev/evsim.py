@@ -41,29 +41,30 @@ def evsim(ev, planning, lossfree=True):
 
         # Moment at which the EV arrives
         if i == arrival_interval:
-            ev.evsoc -=  (ev.evenergy * (departure_interval-arrival_interval))
+
+            ev.evsoc -=  ev.evenergy
 
 
         # Interval that the EV is connected (available)
         if i >= arrival_interval and i < departure_interval:
-            #print("before charging"+str(ev.evsoc))
+
             change = 0
 
             # Check if ev is at full capacity
             if (ev.evsoc < ev.evcapacity):
 
                 # Set change to difference in watt
+
                 change = (ev.evcapacity - ev.evsoc)*1000
 
                 # Check if change is larger than allowed
                 if (change > ev.evpmax):
                     change = ev.evpmax
 
-                ev.evsoc+=change/1000
 
                 profile[i] = change
 
-
+            ev.evsoc += change / 1000
         else:
             # Interval that the EV is disconnected (unavailable)
             pass
@@ -72,7 +73,9 @@ def evsim(ev, planning, lossfree=True):
             # Moment at which the EV departs
             pass
 
+
     # Finally, the resulting power profile for the devicee must be returned
     # This is also a list, with each value representing the power consumption (average) during an interval in Watts
     # The length of this list must be equal to the input planning list
+
     return profile

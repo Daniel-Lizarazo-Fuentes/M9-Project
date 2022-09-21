@@ -151,11 +151,9 @@ class EV():
 			# EV arriving but not connected
 			if i == arrival_interval:
 
-				print("soc: "+str(soc))
+
 
 				soc -= self.evenergy * 1000 * (3600 / cfg_sim['timebase'])
-
-				print("socafter: " + str(soc))
 
 				assert(soc >= 0)
 			# EV present
@@ -170,6 +168,7 @@ class EV():
 
 
 			soc += value
+
 			assert (soc >= 0)
 
 			assert (soc <= capacity)
