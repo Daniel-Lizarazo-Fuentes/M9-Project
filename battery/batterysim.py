@@ -3,56 +3,66 @@ from settings.variables import *
 
 import copy
 
+
 # This function simulates the behaviour of the device
 def batterysim(battery, planning, lossfree=True):
-	# result parameter to be filled:
-	profile = []
-	for slot in planning:
-		profile.append(0)
-	# Battery parameters can be obtained as follows
-	# battery.batsoc        # State of Charge in kWh
-	# battery.batminsoc     # Minimum State of Charge
-	# battery.batcapacity   # Capacity of the battery in kWh
-	# battery.batpmin       # Maximum power in W
-	# battery.batpmax       # Minimum power in W
+    # result parameter to be filled:
+    profile = []
+    for slot in planning:
+        profile.append(0)
+    # Battery parameters can be obtained as follows
+    # battery.batsoc        # State of Charge in kWh
+    # battery.batminsoc     # Minimum State of Charge
+    # battery.batcapacity   # Capacity of the battery in kWh
+    # battery.batpmin       # Maximum power in W
+    # battery.batpmax       # Minimum power in W
 
-	# Other input
-	# planning, which is the planning created for the device with desired control (power) actions
+    # Other input
+    # planning, which is the planning created for the device with desired control (power) actions
 
-	# Running the simulation of the device
+    # Running the simulation of the device
 
-	# Lossfree simulation:
-	if lossfree:
-		soc = copy.deepcopy(battery.batsoc)
-		for i in range(0, len(planning)):
-			change = 0
+    # Lossfree simulation:
+    if lossfree:
+        soc = copy.deepcopy(battery.batsoc)
+        for i in range(0, len(planning)):
+            change = 0
+            if (planning[i] < 0):
+                if (soc + planning[i]/1000 >= battery.batminsoc):
+                    change = planning[i]
+                else:
+                    change = (soc - battery.batminsoc) * 1000
 
-			# Check if battery is at full capacity
-			if (soc < battery.batcapacity):
+            elif(planning[i] > 0):
+                # Check if battery is at full capacity
 
-				# Set change to difference in watt
-				change = (battery.batcapacity - soc) * 1000
+                if (soc + (planning[i]/1000) < battery.batcapacity):
 
-				# Check if change is larger than allowed
-				if (change >  battery.batpmax):
-					change = battery.batpmax
+                    change = planning[i]
+                else:
+                    change = (soc - battery.batminsoc) * 1000
 
-				profile[i] = change
+            if (change < -battery.batpmax):
+                change = -battery.batpmax
+            elif (change > battery.batpmax):
+                change = battery.batpmax
 
-			soc += change / 1000
+            profile[i] = change
+            soc += change / 1000
 
-		# Here you will need to implement yoor simulation code
-		# Create the resulting by filling the profile list
-		# This can be done by e.g. profile.append(value)
+    # Here you will need to implement yoor simulation code
+    # Create the resulting by filling the profile list
+    # This can be done by e.g. profile.append(value)
 
-	# Lossy simulation:
-	else:
-		pass
-		# Here you will need to implement yoor simulation code
-		# Create the resulting by filling the profile list
-		# This can be done by e.g. profile.append(value)
+    # Lossy simulation:
+    else:
+        pass
+    # Here you will need to implement yoor simulation code
+    # Create the resulting by filling the profile list
+    # This can be done by e.g. profile.append(value)
 
-	# Finally, the resulting power profile for the devicee must be returned
-	# This is also a list, with each value representing the power consumption (average) during an interval in Watts
-	# The length of this list must be equal to the input planning list
-	return profile
+    # Finally, the resulting power profile for the devicee must be returned
+    # This is also a list, with each value representing the power consumption (average) during an interval in Watts
+    # The length of this list must be equal to the input planning list
+
+    return profile
