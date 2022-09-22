@@ -36,15 +36,15 @@ class Windturbine():
 			print("The input parameters for device " + str(self.name) + " of house "+str(self.number) +" are invalid! Aborting!")
 			exit()
 
-		profile = []
+		returnprofile = []
 		windspeed = csvToList(self.filename, 0, cfg_sim['startInterval'], cfg_sim['startInterval'] + cfg_sim['intervals'])
 		for i in range(0, len(windspeed)):
 			# Determine production, bear in mind that production is negative
 			# https://www.e-education.psu.edu/emsc297/node/649#:~:text=The%20formula%20is%20capacity%20factor,yr%20(or%20832.2%20MWh).
 			production = -1 * 0.5 * 1.225 * math.pi * pow(self.winddiameter * 0.5, 2) * pow(windspeed[i], 3)
-			profile.append(production)
+			returnprofile.append(production)
 
-		self.profile = profile
+		self.profile = returnprofile
 		return self.profile
 
 

@@ -51,19 +51,20 @@ class EV():
 			exit()
 
 		# Perform the simulation
-		profile = self.simulate(planning, lossfree)
-		if not self.verify_result(profile, lossfree):
+		returnprofile = self.simulate(planning, lossfree)
+		if not self.verify_result(returnprofile, lossfree):
 			print("The simulation of device " + str(self.name) + " failed! Aborting!")
 			exit()
 
-		self.profile = profile
+		self.profile = returnprofile
 		return self.profile
 
 	# Function to initialize the results
-	def initialize(self):
-		# initialize with empty profile
-		self.profile = [0] * cfg_sim['intervals']
-		self.planning = [0] * cfg_sim['intervals']
+	def initialize(self, resetLists = True):
+		if resetLists:
+			# initialize with empty profile
+			self.profile = [0] * cfg_sim['intervals']
+			self.planning = [0] * cfg_sim['intervals']
 
 		# ev settings
 		try:
@@ -85,6 +86,7 @@ class EV():
 
 	# Optimization code
 	def optimize(self, objective, prices, co2, profile, lossfree):
+		self.initialize(False)
 		planning = [0] * cfg_sim['intervals']
 
 		if objective == "optimize_greedy":
@@ -112,6 +114,7 @@ class EV():
 
 	# Simulation code
 	def simulate(self, planning=[], lossfree=True):
+		self.initialize(False)
 		return evsim(self, planning, lossfree)
 
 	# Function to verify the created planning by the optimization code
@@ -126,12 +129,16 @@ class EV():
 		return True
 
 	def verify_planning(self, planning, lossfree=True):
+		self.initialize(False)
 		assert (len(self.planning) == cfg_sim['intervals'])
 		return True
 
 	# Function to verify if the code functions correctly
 	def verify_result(self, profile, lossfree=True):
 		# Internal conversion to Wtau
+		self.initialize(False)
+		assert (len(self.profile) == cfg_sim['intervals'])
+		
 		capacity = 1000 * (3600 / cfg_sim['timebase']) * self.evcapacity
 		soc = 1000 * (3600 / cfg_sim['timebase']) * self.evsoc
 		minsoc = 1000 * (3600 / cfg_sim['timebase']) * self.evminsoc
@@ -148,30 +155,21 @@ class EV():
 			value = profile[i]
 
 			# Reduce SOC upon arrival
-			# EV arriving but not connected
 			if i == arrival_interval:
-
-
-
 				soc -= self.evenergy * 1000 * (3600 / cfg_sim['timebase'])
+				assert(soc >= -0.001)
 
-				assert(soc >= 0)
-			# EV present
 			if i >= arrival_interval and i < departure_interval:
 				# The EV is connecteds
 				assert (value >= self.evpmin)
 				assert (value <= self.evpmax)
 
-			# EV not present
 			else:
 				assert(value == 0)
 
-
 			soc += value
-
-			assert (soc >= 0)
-
-			assert (soc <= capacity)
+			assert (soc >= -0.001)
+			assert (soc <= capacity+0.001)
 
 		return True
 

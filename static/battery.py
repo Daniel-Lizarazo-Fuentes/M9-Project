@@ -46,19 +46,20 @@ class Battery():
 			exit()
 
 		# Perform the simulation
-		profile = self.simulate(planning, lossfree)
-		if not self.verify_result(profile, lossfree):
+		returnprofile = self.simulate(planning, lossfree)
+		if not self.verify_result(returnprofile, lossfree):
 			print("The simulation of device " + str(self.name) + " failed! Aborting!")
 			exit()
 
-		self.profile = profile
+		self.profile = returnprofile
 		return self.profile
 
 	# Function to initialize the results
-	def initialize(self):
-		# initialize with empty profile
-		self.profile = [0] * cfg_sim['intervals']
-		self.planning = [0] * cfg_sim['intervals']
+	def initialize(self, resetLists = True):
+		if resetLists:
+			# initialize with empty profile
+			self.profile = [0] * cfg_sim['intervals']
+			self.planning = [0] * cfg_sim['intervals']
 
 		# Battery settings
 		try:
@@ -73,6 +74,7 @@ class Battery():
 
 	# Optimization code
 	def optimize(self, objective, prices, co2, profile, lossfree):
+		self.initialize(False)
 		planning = [0] * cfg_sim['intervals']
 
 		if objective == "optimize_greedy":
@@ -100,6 +102,7 @@ class Battery():
 
 	# Simulation code
 	def simulate(self, planning=[], lossfree=True):
+		self.initialize(False)
 		return batterysim(self, planning, lossfree)
 
 	# Function to verify the created planning by the optimization code
@@ -122,11 +125,15 @@ class Battery():
 		return True
 
 	def verify_planning(self, planning, lossfree=True):
+		self.initialize(False)
 		assert (len(self.planning) == cfg_sim['intervals'])
 		return True
 
 	# Function to verify if the code functions correctly
 	def verify_result(self, profile, lossfree=True):
+		self.initialize(False)
+		assert (len(self.profile) == cfg_sim['intervals'])
+		
 		# Internal conversion to Wtau
 		capacity = 1000 * (3600 / cfg_sim['timebase']) * self.batcapacity
 		soc = 1000 * (3600 / cfg_sim['timebase']) * self.batsoc
@@ -139,7 +146,6 @@ class Battery():
 
 			# determine if the SoC at the end of the interval will be in bounds
 			soc += value
-			print(i)
-			assert (soc >= minsoc)
-			assert (soc <= capacity)
+			assert (soc >= minsoc - 0.001)
+			assert (soc <= capacity + 0.001)
 		return True

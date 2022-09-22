@@ -49,7 +49,7 @@ class House():
 		for device in self.devices:
 			# Simulate the device
 			p = device.execute(objective, prices, co2, self.aggregate, lossfree)
-
+			
 			assert(len(p) == len(profile))
 
 			self.aggregate = [sum(x) for x in zip(p, self.aggregate)]

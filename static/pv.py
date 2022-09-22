@@ -38,11 +38,11 @@ class PV():
 			print("The input parameters for device " + str(self.name) + " of house "+str(self.number) +" are invalid! Aborting!")
 			exit()
 
-		profile = csvToList(self.filename, self.column, cfg_sim['startInterval'], cfg_sim['startInterval'] + cfg_sim['intervals'])
-		for i in range(0, len(profile)):
-			profile[i] *= self.pvpanels
+		returnprofile = csvToList(self.filename, self.column, cfg_sim['startInterval'], cfg_sim['startInterval'] + cfg_sim['intervals'])
+		for i in range(0, len(returnprofile)):
+			returnprofile[i] *= self.pvpanels
 
-		self.profile = profile
+		self.profile = returnprofile
 		return self.profile
 
 
