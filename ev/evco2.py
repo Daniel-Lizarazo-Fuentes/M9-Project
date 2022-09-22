@@ -1,9 +1,12 @@
 from settings.constants import *
 from settings.variables import *
 
+import math
+import copy
+
 # With this function, a planning for the operation (i.e. control actions) can be implemented
 def evco2(ev, prices, co2, profile, lossfree):
-	# FIXME: This is a placeholder that needs to be implemented
+
 
 	# result parameter:
 	planning = []
@@ -24,7 +27,6 @@ def evco2(ev, prices, co2, profile, lossfree):
 	# Other input
 	# prices, co2, and profile are vectors (lists) with equal length
 
-	# Fallback implementation: Greedy:
 	for i in range(0, len(profile)):
 		planning.append(ev.evpmax)
 
