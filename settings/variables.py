@@ -47,7 +47,7 @@ cfg_houses = {
 	# First house:	# NOTE THE OFF-BY-ONE COUNTING STARTING AT 0!
 	0: {
 		# PV configuration
-		"pvpanels":  1,  # Number of panels, integer
+		"pvpanels":  2,  # Number of panels, integer
 		"pvazimuth": "south",  # Available options: east, southeast, south, southwest, west
 		"pvtilt":  30,  # Available options: 10, 15, 20, 25, 30, 35, 40, 45, 50
 

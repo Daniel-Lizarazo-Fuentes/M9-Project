@@ -139,6 +139,7 @@ class Battery():
 
 			# determine if the SoC at the end of the interval will be in bounds
 			soc += value
+			print(i)
 			assert (soc >= minsoc)
 			assert (soc <= capacity)
 		return True
