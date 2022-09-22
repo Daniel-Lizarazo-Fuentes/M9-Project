@@ -27,25 +27,29 @@ def batterysim(battery, planning, lossfree=True):
         soc = copy.deepcopy(battery.batsoc)
         for i in range(0, len(planning)):
             change = 0
+
             if (planning[i] < 0):
-                if (soc + planning[i] / 1000 >= battery.batminsoc):
+                if (soc + (planning[i] / 1000) >= battery.batminsoc):
                     change = planning[i]
+
                 else:
-                    change = (soc - battery.batminsoc) * 1000
+                    change = -(soc - battery.batminsoc) * 1000
 
             elif (planning[i] > 0):
+
+
 
                 # Check if battery is at full capacity
                 if (soc + (planning[i] / 1000) < battery.batcapacity):
                     change = planning[i]
                 else:
-                    change = (soc - battery.batminsoc) * 1000
+                    change = ( battery.batcapacity-soc) * 1000
 
-            if (change < -battery.batpmax):
+
+            if (change < 0 and change < -battery.batpmax):
                 change = -battery.batpmax
-            elif (change > battery.batpmax):
+            elif (change > 0 and change > battery.batpmax):
                 change = battery.batpmax
-
             profile[i] = change
             soc += change / 1000
 
@@ -63,4 +67,5 @@ def batterysim(battery, planning, lossfree=True):
     # Finally, the resulting power profile for the devicee must be returned
     # This is also a list, with each value representing the power consumption (average) during an interval in Watts
     # The length of this list must be equal to the input planning list
+
     return profile
