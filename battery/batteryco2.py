@@ -14,7 +14,7 @@ def batteryco2(battery, prices, co2, profile, lossfree):
                 change = battery.batpmax
         elif (change < 0):
             if (soc + (change / 1000) < battery.batminsoc):
-                change = (soc-battery.batminsoc) * 1000
+                change = (soc - battery.batminsoc) * 1000
             if (change < battery.batpmin):
                 change = battery.batpmin
 
@@ -24,6 +24,7 @@ def batteryco2(battery, prices, co2, profile, lossfree):
     planning = []
     for slot in profile:
         planning.append(0)
+    socValues = []
     # Battery parameters can be obtained as follows
     # battery.batsoc        # State of Charge in kWh
     # battery.batminsoc     # Minimum State of Charge
@@ -33,27 +34,81 @@ def batteryco2(battery, prices, co2, profile, lossfree):
 
     # Other input
     # prices, co2, and profile are vectors (lists) with equal length
-    soc = copy.deepcopy(battery.batsoc)
+
     if lossfree:
         # Loss free implementation
+        soc = copy.deepcopy(battery.batsoc)
+        # Fill aray based on CO2
         for i in range(0, len(profile)):
             change = 0
 
-            # if battery is not full and c02 of next interval is higher than current:
-            if(soc < battery.batcapacity and i < len(co2) - 1 and co2[i] < co2[i + 1]):
-                # Python <3.10 doesn't have a switch so here a large if else series
-                if():
-                    pass
+            # c02 of next interval is higher than current:
+            try:
+                # if (co2[i] < co2[i + 1]):
+                #     # If sum of next 4 (incl current) usage values + soc are smaller than battery capacity: fill battery now
+                #     if (
+                #             ((-sum(profile[i:i + 3])) / 1000) + soc < battery.batcapacity
+                #     ):
+                #         change = battery.batpmax
+                #     else:
+                #         change = -profile[i]
+                # elif (co2[i] >= co2[i + 1]):
+                #     change = -profile[i]
+                # else:
+                #     change = -profile[i]
 
 
-            cutCurrent(soc, change)
+                # If Co2 below average
+                if(co2[i]<(sum(co2)/len(co2))):
+                    if( -profile[i]>0):
+                        change = -profile[i]
+                    if (
+                            ((-sum(profile[i:i+5]) / 1000) + soc) < battery.batcapacity
+                    ):
+                        change = battery.batpmax
 
-            soc += change / 1000
+                # If Co2 is abvoe average
+                else:
+                    if (-profile[i] < 0):
+                        change = -profile[i]
+
+            except IndexError:
+                change = -profile[i]
+
+            # haircuts the change
+            change = cutCurrent(soc, change)
             planning[i] = change
+            soc += change / 1000
 
-            # print('\n')
-            # print(planning[i])
-            # print(soc)
+        # Adjust array based on usage
+        # soc = copy.deepcopy(battery.batsoc)
+        # for i in range(0, len(profile)):
+        #     change = planning[i]
+        #
+        #     # User discharges and battery discharges
+        #     if (planning[i] < 0 and profile[i] < 0):
+        #         pass
+        #     # User discharges and battery charges
+        #     elif (planning[i] > 0 and profile[i] < 0):
+        #         pass
+        #     # User charges and battery charges
+        #     elif (planning[i] > 0 and profile[i] > 0):
+        #         pass
+        #     # User charges and battery discharges
+        #     elif (planning[i] < 0 and profile[i] > 0):
+        #         pass
+        #
+        #     # haircuts the change
+        #     change = cutCurrent(soc, change)
+        #     planning[i] = change
+        #
+        #     soc += change / 1000
+        #     socValues.append(soc)
+        #
+        #     # print('\n')
+        #     # print(planning[i])
+        #     # print(soc)
+
 
     else:
         # Lossy implementation
@@ -66,10 +121,11 @@ def batteryco2(battery, prices, co2, profile, lossfree):
     # This is also a list, with each value representing the power consumption (average) during an interval in Watts
     # The length of this list must be equal to the input vectprs (i.e., prices, co2 and profile)
 
-    print('\n')
-    print(co2[0:45])
-    print(profile[0:45])
-    print(planning[0:45])
-    print('\n')
+    # print('\n')
+    # print(co2)
+    # print(profile)
+    # print(planning)
+    # print(socValues)
+    # print('\n')
 
     return planning

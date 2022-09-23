@@ -149,6 +149,7 @@ class Battery():
 
         assert (len(profile) == cfg_sim['intervals'])
 
+
         for value in profile:
             assert (value >= self.batpmin)
             assert (value <= self.batpmax)
@@ -157,6 +158,7 @@ class Battery():
             soc += value
 
             assert (soc >= minsoc - 0.001)
+
             assert (soc <= capacity + 0.001)
 
         return True

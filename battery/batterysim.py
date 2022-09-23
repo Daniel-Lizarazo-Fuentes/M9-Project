@@ -6,6 +6,20 @@ import copy
 
 # This function simulates the behaviour of the device
 def batterysim(battery, planning, lossfree=True):
+    def cutCurrent(soc, change):
+        if (change > 0):
+            if (soc + (change / 1000) >= battery.batcapacity):
+                change = (battery.batcapacity - soc) * 1000
+            if (change > battery.batpmax):
+                change = battery.batpmax
+        elif (change < 0):
+            if (soc + (change / 1000) <= battery.batminsoc):
+                change = (soc-battery.batminsoc) * 1000
+            if (change < battery.batpmin):
+                change = battery.batpmin
+
+        return change
+
     # result parameter to be filled:
     profile = []
     for slot in planning:
@@ -27,29 +41,7 @@ def batterysim(battery, planning, lossfree=True):
         soc = copy.deepcopy(battery.batsoc)
         for i in range(0, len(planning)):
             change = 0
-
-            if (planning[i] < 0):
-                if (soc + (planning[i] / 1000) >= battery.batminsoc):
-                    change = planning[i]
-
-                else:
-                    change = -(soc - battery.batminsoc) * 1000
-
-            elif (planning[i] > 0):
-
-
-
-                # Check if battery is at full capacity
-                if (soc + (planning[i] / 1000) < battery.batcapacity):
-                    change = planning[i]
-                else:
-                    change = ( battery.batcapacity-soc) * 1000
-
-
-            if (change < 0 and change < -battery.batpmax):
-                change = -battery.batpmax
-            elif (change > 0 and change > battery.batpmax):
-                change = battery.batpmax
+            change = cutCurrent(soc, planning[i])
             profile[i] = change
             soc += change / 1000
 
