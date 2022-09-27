@@ -4,12 +4,27 @@ from settings.variables import *
 import math
 import copy
 
+
 # This function simulates the behaviour of the device
 def evsim(ev, planning, lossfree=True):
     # result parameter:
     profile = []
     for slot in planning:
         profile.append(0)
+
+    def cutCurrent(soc, change):
+        if (change > 0):
+            if (soc + (change / 1000) > ev.evcapacity):
+                change = (ev.evcapacity - soc) * 1000
+            if (change > ev.evpmax):
+                change = ev.evpmax
+        elif (change < 0):
+            if (soc + (change / 1000) < ev.evminsoc):
+                change = -(soc - ev.evminsoc) * 1000
+            if (change < ev.evpmin):
+                change = ev.evpmin
+
+        return change
 
     # ev parameters can be obtained as follows
     # ev.evsoc              # State of Charge of the EV in kWh
@@ -35,8 +50,9 @@ def evsim(ev, planning, lossfree=True):
 
     soc = copy.deepcopy(ev.evsoc)
 
-    j = 0
     for i in range(0, len(planning)):
+        change = 0
+
         # Helpers to calculate availability
         arrival_day = math.floor(i / intervals_per_day)
         arrival_interval = arrival_day * intervals_per_day + ev.evarrivalhour * intervals_per_hour
@@ -44,29 +60,13 @@ def evsim(ev, planning, lossfree=True):
 
         # Moment at which the EV arrives
         if i == arrival_interval:
-
-            soc -=  ev.evenergy
-
+            soc -= ev.evenergy
 
         # Interval that the EV is connected (available)
         if i >= arrival_interval and i < departure_interval:
-
-            change = 0
-
-            # Check if ev is at full capacity
-            if (soc < ev.evcapacity):
-
-                # Set change to difference in watt
-
-                change = (ev.evcapacity - soc)*1000
-
-                # Check if change is larger than allowed
-                if (change > ev.evpmax):
-                    change = ev.evpmax
-
-
-                profile[i] = change
-
+            change = ev.evpmax
+            change = cutCurrent(soc, change)
+            profile[i] = change
             soc += change / 1000
         else:
             # Interval that the EV is disconnected (unavailable)
@@ -75,7 +75,6 @@ def evsim(ev, planning, lossfree=True):
         if i == departure_interval:
             # Moment at which the EV departs
             pass
-
 
     # Finally, the resulting power profile for the devicee must be returned
     # This is also a list, with each value representing the power consumption (average) during an interval in Watts
