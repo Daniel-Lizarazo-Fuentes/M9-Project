@@ -7,9 +7,9 @@ import copy
 # With this function, a planning for the operation (i.e. control actions) can be implemented
 def evco2(ev, prices, co2, profile, lossfree):
 
-
 	# result parameter:
 	planning = []
+
 
 	# ev parameters can be obtained as follows
 	# ev.evsoc              # State of Charge of the EV in kWh
@@ -26,7 +26,6 @@ def evco2(ev, prices, co2, profile, lossfree):
 
 	# Other input
 	# prices, co2, and profile are vectors (lists) with equal length
-
 	for i in range(0, len(profile)):
 		planning.append(ev.evpmax)
 

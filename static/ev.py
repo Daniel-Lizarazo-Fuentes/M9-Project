@@ -18,10 +18,10 @@ class EV():
 		self.type = "load"
 
 		# Placeholder, will be loaded upon initialize()
-		self.evsoc = 0 # w
-		self.evcapacity = 40 # kw
-		self.evpmin = 0  # w
-		self.evpmax = 11000 # w
+		self.evsoc = 0
+		self.evcapacity = 40
+		self.evpmin = 0
+		self.evpmax = 11000
 
 		# Static Charging session duration 
 		self.evenergy = 5 + (self.number % 5)  # Energy demand in kWh per driving session
@@ -148,9 +148,15 @@ class EV():
 
 		for i in range(0, len(profile)):
 			# check availability:
-			arrival_day = math.floor(i / intervals_per_day)
-			arrival_interval = arrival_day * intervals_per_day + self.evarrivalhour * intervals_per_hour
-			departure_interval = arrival_interval + self.evconnectiontime * intervals_per_hour
+			arrival_day = math.floor(i/intervals_per_day)
+			arrival_interval = int(arrival_day*intervals_per_day + self.evarrivalhour * intervals_per_hour)
+			departure_interval = int(arrival_interval + self.evconnectiontime * intervals_per_hour)
+			
+			# Check for overruns:
+			if self.evarrivalhour+self.evconnectiontime >= 24:
+				if departure_interval - (24 * (3600 / cfg_sim['timebase'])) > i and arrival_interval - (24 * (3600 / cfg_sim['timebase'])) > 0:
+					departure_interval -= int(24 * (3600 / cfg_sim['timebase']))
+					arrival_interval -= int(24 * (3600 / cfg_sim['timebase']))
 
 			value = profile[i]
 

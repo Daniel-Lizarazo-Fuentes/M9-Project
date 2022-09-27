@@ -5,7 +5,7 @@ import math
 def csvToList(file, column, start, end, delimiter=';'):
 	result = []
 	
-	f = open(file, 'r')
+	f = open(file, 'r', encoding='utf-8-sig')
 	ln = 0
 	for line in f:
 		if ln >= start and ln < end:
@@ -69,7 +69,7 @@ def obtain_scores(simulation_name, aggregated, demand, supply, storage, prices, 
 	# 1-norm
 	norm_one = 0
 	for value in diff_vector:
-		norm_one = norm_one+math.sqrt(value)
+		norm_one = norm_one+value
 	# print(name + " 1-norm score: " + str(norm_one))
 	result.append(str("%.2E" % norm_one))
 
@@ -77,7 +77,7 @@ def obtain_scores(simulation_name, aggregated, demand, supply, storage, prices, 
 	norm_two = 0
 	for value in diff_vector:
 		norm_two = norm_two + pow(value, 2)
-		norm_two = math.sqrt(norm_two)
+	norm_two = math.sqrt(norm_two)
 	# print(name + " 2-norm score: " + str(norm_two))
 	result.append(str("%.2E" % norm_two))
 
