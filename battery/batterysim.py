@@ -7,6 +7,7 @@ import copy
 # This function simulates the behaviour of the device
 def batterysim(battery, planning, lossfree=True):
     def cutCurrent(soc, change):
+        original = change
         if (change > 0):
             if (soc + (change / 1000) >= battery.batcapacity):
                 change = (battery.batcapacity - soc) * 1000
@@ -14,7 +15,7 @@ def batterysim(battery, planning, lossfree=True):
                 change = battery.batpmax
         elif (change < 0):
             if (soc + (change / 1000) <= battery.batminsoc):
-                change = (soc-battery.batminsoc) * 1000
+                change = -(soc-battery.batminsoc) * 1000
             if (change < battery.batpmin):
                 change = battery.batpmin
 
@@ -44,6 +45,7 @@ def batterysim(battery, planning, lossfree=True):
             change = cutCurrent(soc, planning[i])
             profile[i] = change
             soc += change / 1000
+
 
     # Here you will need to implement yoor simulation code
     # Create the resulting by filling the profile list

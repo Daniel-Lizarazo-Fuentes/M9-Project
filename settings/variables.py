@@ -47,16 +47,16 @@ cfg_houses = {
 	# First house:	# NOTE THE OFF-BY-ONE COUNTING STARTING AT 0!
 	0: {
 		# PV configuration
-		"pvpanels":  4,  # Number of panels, integer
+		"pvpanels":  5,  # Number of panels, integer
 		"pvazimuth": "south",  # Available options: east, southeast, south, southwest, west
 		"pvtilt":  30,  # Available options: 10, 15, 20, 25, 30, 35, 40, 45, 50
 
 		# Wind turbine configuration
-		"winddiameter": 4,  # Diameter in metres
+		"winddiameter": 3,  # Diameter in metres
 
 		# Battery configuration
 		"batminsoc":    0,  # Minimum state of charge in kWh
-		"batcapacity":  3,  # Capacity in kWh
+		"batcapacity":  4,  # Capacity in kWh
 		"batsoc":       0,  # Initial State of Charge at start of simulation in kWh
 		"batpmin":      -3000,  # Minumum power (discharge is negative) in W
 		"batpmax":      3000,  # Maximum power in W
@@ -74,7 +74,7 @@ cfg_houses = {
 
 		# Battery configuration
 		"batminsoc":	0,  # Minimum state of charge in kWh
-		"batcapacity":  3,  # Capacity in kWh
+		"batcapacity":  4,  # Capacity in kWh
 		"batsoc":       0,  # Initial State of Charge at start of simulation in kWh
 		"batpmin":      -3000,  # Minumum power (discharge is negative) in W
 		"batpmax":      3000,  # Maximum power in W
