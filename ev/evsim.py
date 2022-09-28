@@ -56,16 +56,22 @@ def evsim(ev, planning, lossfree=True):
         arrival_interval = arrival_day * intervals_per_day + ev.evarrivalhour * intervals_per_hour
         departure_interval = arrival_interval + ev.evconnectiontime * intervals_per_hour
 
+        if ev.evarrivalhour + ev.evconnectiontime >= 24:
+            if departure_interval - (24 * (3600 / cfg_sim['timebase'])) > i and arrival_interval - (
+                    24 * (3600 / cfg_sim['timebase'])) > 0:
+                departure_interval -= int(24 * (3600 / cfg_sim['timebase']))
+                arrival_interval -= int(24 * (3600 / cfg_sim['timebase']))
+
         # Moment at which the EV arrives
         if i == arrival_interval:
-            soc -= ev.evenergy
+
+            soc -= ev.evenergy * (3600 / cfg_sim['timebase'])
 
         # Interval that the EV is connected (available)
         if i >= arrival_interval and i < departure_interval:
-
-            iEnd = int(departure_interval - 1)
             change = cutCurrent(soc, planning[i])
-            if (i == iEnd):
+
+            if (i == departure_interval - 1):
                 change = cutCurrent(soc, ev.evpmax)
             profile[i] = change
 
@@ -76,6 +82,7 @@ def evsim(ev, planning, lossfree=True):
             pass
 
         if i == departure_interval:
+
             # Moment at which the EV departs
             pass
 

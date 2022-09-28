@@ -160,11 +160,17 @@ class EV():
 
 			value = profile[i]
 
+
+
 			# Reduce SOC upon arrival
 			if i == arrival_interval:
 
 				soc -= self.evenergy * 1000 * (3600 / cfg_sim['timebase'])
-
+				if (soc<0):
+					print(i)
+					print(profile[i])
+					print(self.evenergy * 1000 * (3600 / cfg_sim['timebase']))
+					print(soc)
 				assert(soc >= -0.001)
 
 			if i >= arrival_interval and i < departure_interval:
