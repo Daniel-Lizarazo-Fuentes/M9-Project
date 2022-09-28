@@ -19,10 +19,7 @@ def evsim(ev, planning, lossfree=True):
             if (change > ev.evpmax):
                 change = ev.evpmax
         elif (change < 0):
-            if (soc + (change / 1000) < ev.evminsoc):
-                change = -(soc - ev.evminsoc) * 1000
-            if (change < ev.evpmin):
-                change = ev.evpmin
+            change = 0
 
         return change
 
@@ -64,8 +61,7 @@ def evsim(ev, planning, lossfree=True):
 
         # Interval that the EV is connected (available)
         if i >= arrival_interval and i < departure_interval:
-            change = ev.evpmax
-            change = cutCurrent(soc, change)
+            change = cutCurrent(soc, planning[i])
             profile[i] = change
             soc += change / 1000
         else:

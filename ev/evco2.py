@@ -20,14 +20,13 @@ def evco2(ev, prices, co2, profile, lossfree):
     def cutCurrent(soc, change):
         if (change > 0):
             if (soc + (change / 1000) > ev.evcapacity):
+
                 change = (ev.evcapacity - soc) * 1000
+
             if (change > ev.evpmax):
                 change = ev.evpmax
         elif (change < 0):
-            if (soc + (change / 1000) < ev.evminsoc):
-                change = -(soc - ev.evminsoc) * 1000
-            if (change < ev.evpmin):
-                change = ev.evpmin
+            change = 0
 
         return change
 
@@ -64,8 +63,7 @@ def evco2(ev, prices, co2, profile, lossfree):
         # Interval that the EV is connected (available)
         if i >= arrival_interval and i < departure_interval:
 
-            iEnd = int(departure_interval - 1)
-
+            #iEnd = int(departure_interval - 1)
             # # Check if the sum of charges in the interval + soc is greater than min soc
             # if (soc + sum(tempProfile[i:iEnd]) >= ev.evminsoc):
             #     change = tempProfile[i]
@@ -84,13 +82,15 @@ def evco2(ev, prices, co2, profile, lossfree):
             # Check if ev is at full capacity
 
 
+            change = cutCurrent(soc, tempProfile[i])
+            if (i==departure_interval-1):
+                change = cutCurrent(soc, ev.evpmax)
+            planning[i] = change
 
-            change = tempProfile[i]
+
+            soc += change / 1000
 
 
-        change = cutCurrent(soc, change)
-        planning[i] = change
-        soc += change / 1000
     else:
         # Interval that the EV is disconnected (unavailable)
         pass
@@ -103,5 +103,6 @@ def evco2(ev, prices, co2, profile, lossfree):
     # Finally, the resulting planning for the device must be returned
     # This is also a list, with each value representing the power consumption (average) during an interval in Watts
     # The length of this list must be equal to the input vectors (i.e., prices, co2 and profile)
+
 
     return planning
