@@ -101,6 +101,24 @@ cfg_houses = {
         "batpmax": 3000,  # Maximum power in W
     },
 
+    2: {
+        # PV configuration
+        "pvpanels": 7,  # Number of panels, integer
+        "pvazimuth": "south",  # Available options: east, southeast, south, southwest, west
+        "pvtilt": 40,  # Available options: 10, 15, 20, 25, 30, 35, 40, 45, 50
+
+        # Wind turbine configuration
+        "winddiameter": 0,  # Diameter in metres
+
+        # Battery configuration
+        "batminsoc": 0,  # Minimum state of charge in kWh
+        "batcapacity": 3,  # Capacity in kWh
+        "batsoc": 0,  # Initial State of Charge at start of simulation in kWh
+        "batpmin": -3000,  # Minumum power (discharge is negative) in W
+        "batpmax": 3000,  # Maximum power in W
+    },
+
+
     # Copy the configuration for how many houses you have
 }
 
