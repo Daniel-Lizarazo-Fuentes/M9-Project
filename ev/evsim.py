@@ -48,6 +48,7 @@ def evsim(ev, planning, lossfree=True):
     soc = copy.deepcopy(ev.evsoc)
 
     for i in range(0, len(planning)):
+
         change = 0
 
         # Helpers to calculate availability
@@ -61,9 +62,15 @@ def evsim(ev, planning, lossfree=True):
 
         # Interval that the EV is connected (available)
         if i >= arrival_interval and i < departure_interval:
+
+            iEnd = int(departure_interval - 1)
             change = cutCurrent(soc, planning[i])
+            if (i == iEnd):
+                change = cutCurrent(soc, ev.evpmax)
             profile[i] = change
+
             soc += change / 1000
+
         else:
             # Interval that the EV is disconnected (unavailable)
             pass
