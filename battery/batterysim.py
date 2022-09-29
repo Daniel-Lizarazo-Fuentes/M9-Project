@@ -6,6 +6,7 @@ import copy
 
 # This function simulates the behaviour of the device
 def batterysim(battery, planning, lossfree=True):
+    # Function for hecking if proposed change is allowed based on capacity, minsoc and batpmin/batpmax.
     def cutCurrent(soc, change):
         original = change
         if (change > 0):

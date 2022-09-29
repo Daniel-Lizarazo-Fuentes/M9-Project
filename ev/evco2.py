@@ -17,6 +17,7 @@ def evco2(ev, prices, co2, profile, lossfree):
         else:
             tempProfile.append(-slot)
 
+    # Check if current soc allows the proposed change based on capacity and max power change, also only charging
     def cutCurrent(soc, change):
         if (change > 0):
             if (soc + (change / 1000) > ev.evcapacity):
