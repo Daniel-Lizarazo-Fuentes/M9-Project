@@ -145,7 +145,16 @@ class Battery():
 			assert (value <= self.batpmax)
 
 			# determine if the SoC at the end of the interval will be in bounds
-			soc += value
-			assert (soc >= minsoc - 0.001)
-			assert (soc <= capacity + 0.001)
+			if lossfree:
+				soc += value
+				
+			else:
+				if value > 0:
+					# Charging:
+					soc += value * 0.95
+				else:
+					soc += value * 1.05
+			
+			assert (soc >= minsoc - 0.1)
+			assert (soc <= capacity + 0.1)
 		return True
